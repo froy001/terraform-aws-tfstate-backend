@@ -46,7 +46,7 @@ output "dynamodb_table_arn" {
   description = "DynamoDB table ARN"
 }
 
-output "terraform_backend_config" {
-  value       = data.template_file.terraform_backend_config.rendered
-  description = "Rendered Terraform backend config file"
-}
+# output "terraform_backend_config" {
+#   value       = data.template_file.terraform_backend_config.rendered
+#   description = "Rendered Terraform backend config file"
+# }
