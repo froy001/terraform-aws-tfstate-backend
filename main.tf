@@ -93,12 +93,16 @@ data "aws_iam_policy_document" "prevent_unencrypted_uploads" {
   }
 }
 
+resource "aws_s3_bucket_policy" "tf_state" {
+  bucket = aws_s3_bucket.default.id
+  policy = local.policy
+}
+
 resource "aws_s3_bucket" "default" {
   bucket        = var.s3_bucket_name
   acl           = var.acl
   region        = var.region
   force_destroy = var.force_destroy
-  policy        = local.policy
 
   versioning {
     enabled    = true
