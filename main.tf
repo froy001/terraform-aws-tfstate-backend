@@ -51,7 +51,7 @@ data "aws_iam_policy_document" "prevent_unencrypted_uploads" {
     ]
 
     resources = [
-      "arn:aws:s3:::${module.s3_bucket_label.id}/*",
+      "${aws_s3_bucket.default.arn}/*",
     ]
 
     condition {
@@ -79,7 +79,7 @@ data "aws_iam_policy_document" "prevent_unencrypted_uploads" {
     ]
 
     resources = [
-      "arn:aws:s3:::${module.s3_bucket_label.id}/*",
+      "${aws_s3_bucket.default.arn}/*",
     ]
 
     condition {
@@ -132,7 +132,7 @@ module "dynamodb_table_label" {
 
 resource "aws_dynamodb_table" "with_server_side_encryption" {
   count          = var.enable_server_side_encryption ? 1 : 0
-  name           = var.dynamedb_lock_table
+  name           = var.dynamodb_lock_table
   read_capacity  = var.read_capacity
   write_capacity = var.write_capacity
 
