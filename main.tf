@@ -94,7 +94,7 @@ data "aws_iam_policy_document" "prevent_unencrypted_uploads" {
 }
 
 resource "aws_s3_bucket" "default" {
-  bucket        = module.s3_bucket_label.id
+  bucket        = var.s3_bucket_name
   acl           = var.acl
   region        = var.region
   force_destroy = var.force_destroy
@@ -132,7 +132,7 @@ module "dynamodb_table_label" {
 
 resource "aws_dynamodb_table" "with_server_side_encryption" {
   count          = var.enable_server_side_encryption ? 1 : 0
-  name           = module.dynamodb_table_label.id
+  name           = var.dynamedb_lock_table
   read_capacity  = var.read_capacity
   write_capacity = var.write_capacity
 
@@ -160,7 +160,7 @@ resource "aws_dynamodb_table" "with_server_side_encryption" {
 
 resource "aws_dynamodb_table" "without_server_side_encryption" {
   count          = var.enable_server_side_encryption ? 0 : 1
-  name           = module.dynamodb_table_label.id
+  name           = var.dynamodb_lock_table
   read_capacity  = var.read_capacity
   write_capacity = var.write_capacity
 
@@ -182,31 +182,31 @@ resource "aws_dynamodb_table" "without_server_side_encryption" {
   tags = module.dynamodb_table_label.tags
 }
 
-data "template_file" "terraform_backend_config" {
-  template = file("${path.module}/templates/terraform.tf.tpl")
+# data "template_file" "terraform_backend_config" {
+#   template = file("${path.module}/templates/terraform.tf.tpl")
 
-  vars = {
-    region = var.region
-    bucket = aws_s3_bucket.default.id
+#   vars = {
+#     region = var.region
+#     bucket = aws_s3_bucket.default.id
 
-    dynamodb_table = element(
-      coalescelist(
-        aws_dynamodb_table.with_server_side_encryption.*.name,
-        aws_dynamodb_table.without_server_side_encryption.*.name
-      ),
-      0
-    )
+#     dynamodb_table = element(
+#       coalescelist(
+#         aws_dynamodb_table.with_server_side_encryption.*.name,
+#         aws_dynamodb_table.without_server_side_encryption.*.name
+#       ),
+#       0
+#     )
 
-    encrypt              = var.enable_server_side_encryption ? "true" : "false"
-    role_arn             = var.role_arn
-    profile              = var.profile
-    terraform_version    = var.terraform_version
-    terraform_state_file = var.terraform_state_file
-  }
-}
+#     encrypt              = var.enable_server_side_encryption ? "true" : "false"
+#     role_arn             = var.role_arn
+#     profile              = var.profile
+#     terraform_version    = var.terraform_version
+#     terraform_state_file = var.terraform_state_file
+#   }
+# }
 
-resource "local_file" "terraform_backend_config" {
-  count    = var.terraform_backend_config_file_path != "" ? 1 : 0
-  content  = data.template_file.terraform_backend_config.rendered
-  filename = local.terraform_backend_config_file
-}
+# resource "local_file" "terraform_backend_config" {
+#   count    = var.terraform_backend_config_file_path != "" ? 1 : 0
+#   content  = data.template_file.terraform_backend_config.rendered
+#   filename = local.terraform_backend_config_file
+# }

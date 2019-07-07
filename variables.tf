@@ -191,3 +191,14 @@ variable "terraform_state_file" {
   default     = "terraform.tfstate"
   description = "The path to the state file inside the bucket"
 }
+
+variable "dynamodb_lock_table" {
+  type = string
+  default = "dynamodb-lock-table"
+  description = "The name for the s3 tf state lock table"
+}
+
+variable "s3_bucket_name" {
+  type = string
+  description = "The name of the s3 bucket to keep tf states in"
+}
